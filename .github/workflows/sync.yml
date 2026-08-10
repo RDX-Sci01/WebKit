@@ -1,11 +1,11 @@
 name: Sync slopkit2
 
 on:
-  # Automatically check once per day
+  # Check for upstream changes every day at midnight UTC
   schedule:
     - cron: "0 0 * * *"
 
-  # Allow you to run it manually
+  # Allow manual syncing from Actions
   workflow_dispatch:
 
 permissions:
@@ -16,16 +16,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Get your repository
-      - name: Checkout my repository
-        uses: actions/checkout@v4
+      # --------------------------------------------------
+      # 1. Checkout YOUR repository
+      # --------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      # 2. Download ONLY the upstream slopkit2 folder
+      # --------------------------------------------------
+      # 2. Download ONLY upstream/slopkit2
+      # --------------------------------------------------
       - name: Download upstream slopkit2
         run: |
-          set -e
+          set -euo pipefail
 
           git clone \
             --depth 1 \
@@ -38,34 +42,76 @@ jobs:
 
           git sparse-checkout set slopkit2
 
-      # 3. Make sure the download is valid
+      # --------------------------------------------------
+      # 3. Verify the upstream folder exists
+      # --------------------------------------------------
       - name: Validate upstream folder
         run: |
-          set -e
+          set -euo pipefail
 
           if [ ! -d "upstream/slopkit2" ]; then
-            echo "ERROR: upstream/slopkit2 does not exist."
-            echo "Keeping existing files."
+            echo "::error::Upstream slopkit2 folder does not exist."
+            echo "Your existing copy will NOT be changed."
             exit 1
           fi
 
-          if [ -z "$(find upstream/slopkit2 -type f -print -quit)" ]; then
-            echo "ERROR: upstream/slopkit2 is empty."
-            echo "Keeping existing files."
+          echo "Upstream folder exists."
+
+      # --------------------------------------------------
+      # 4. Verify the upstream folder isn't empty
+      # --------------------------------------------------
+      - name: Check upstream folder is not empty
+        run: |
+          set -euo pipefail
+
+          FILE_COUNT=$(find upstream/slopkit2 -type f | wc -l)
+
+          echo "Found $FILE_COUNT files."
+
+          if [ "$FILE_COUNT" -eq 0 ]; then
+            echo "::error::Upstream slopkit2 folder is empty."
+            echo "Your existing copy will NOT be changed."
             exit 1
           fi
 
-          echo "Upstream slopkit2 looks valid."
+      # --------------------------------------------------
+      # 5. Verify the website has an index.html
+      # --------------------------------------------------
+      - name: Check index.html
+        run: |
+          set -euo pipefail
 
-      # 4. Replace our copy ONLY after validation succeeds
+          if [ ! -f "upstream/slopkit2/index.html" ]; then
+            echo "::error::Upstream slopkit2 has no index.html."
+            echo "Your existing copy will NOT be changed."
+            exit 1
+          fi
+
+          echo "index.html found."
+
+      # --------------------------------------------------
+      # 6. Prepare the new copy in a temporary directory
+      # --------------------------------------------------
+      - name: Prepare new slopkit2
+        run: |
+          set -euo pipefail
+
+          rm -rf new-slopkit2
+          cp -a upstream/slopkit2 new-slopkit2
+
+      # --------------------------------------------------
+      # 7. Replace our copy ONLY after all checks passed
+      # --------------------------------------------------
       - name: Update slopkit2
         run: |
-          set -e
+          set -euo pipefail
 
           rm -rf slopkit2
-          cp -a upstream/slopkit2 slopkit2
+          mv new-slopkit2 slopkit2
 
-      # 5. Check whether anything actually changed
+      # --------------------------------------------------
+      # 8. Check whether anything changed
+      # --------------------------------------------------
       - name: Check for changes
         id: changes
         run: |
@@ -77,14 +123,27 @@ jobs:
             echo "Changes detected."
           fi
 
-      # 6. Commit and push only when there are changes
+      # --------------------------------------------------
+      # 9. Commit changes
+      # --------------------------------------------------
       - name: Commit changes
         if: steps.changes.outputs.changed == 'true'
         run: |
+          set -euo pipefail
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add slopkit2
 
           git commit -m "Sync slopkit2 from upstream"
+
           git push
+
+      # --------------------------------------------------
+      # 10. Nothing to do
+      # --------------------------------------------------
+      - name: No changes
+        if: steps.changes.outputs.changed == 'false'
+        run: |
+          echo "slopkit2 is already up to date."
