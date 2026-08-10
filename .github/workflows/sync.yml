@@ -1,11 +1,8 @@
 name: Sync slopkit2
 
 on:
-  # Check upstream once per day
   schedule:
     - cron: "0 0 * * *"
-
-  # Allow manual syncing
   workflow_dispatch:
 
 permissions:
@@ -14,6 +11,7 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    timeout-minutes: 15          # ← prevents hung clone from wasting quota
 
     steps:
 
@@ -42,9 +40,7 @@ jobs:
             upstream
 
           cd upstream
-
           git sparse-checkout set slopkit2
-
           cd ..
 
           echo "Download completed."
@@ -58,7 +54,6 @@ jobs:
 
           if [ ! -d "upstream/slopkit2" ]; then
             echo "::error::Upstream slopkit2 folder does not exist."
-            echo "Your existing copy has NOT been modified."
             exit 1
           fi
 
@@ -72,12 +67,10 @@ jobs:
           set -euo pipefail
 
           FILE_COUNT=$(find upstream/slopkit2 -type f | wc -l)
-
           echo "Upstream contains $FILE_COUNT files."
 
           if [ "$FILE_COUNT" -eq 0 ]; then
-            echo "::error::Upstream slopkit2 is EMPTY."
-            echo "Your existing copy has NOT been modified."
+            echo "::error::Upstream slopkit2 is EMPTY. Aborting to protect your copy."
             exit 1
           fi
 
@@ -91,18 +84,14 @@ jobs:
           set -euo pipefail
 
           if [ ! -f "upstream/slopkit2/index.html" ]; then
-            echo "::error::upstream/slopkit2/index.html is missing."
-            echo "Your existing copy has NOT been modified."
+            echo "::error::upstream/slopkit2/index.html is missing. Aborting."
             exit 1
           fi
 
           echo "index.html exists."
 
       # ============================================================
-      # 6. Prepare a temporary copy
-      #
-      # IMPORTANT:
-      # We don't touch your existing slopkit2 yet.
+      # 6. Prepare a temporary copy (strip symlinks for safety)
       # ============================================================
       - name: Prepare new copy
         run: |
@@ -110,39 +99,35 @@ jobs:
 
           rm -rf new-slopkit2
 
-          cp -a upstream/slopkit2 new-slopkit2
+          # -a preserves times/perms but we explicitly dereference symlinks
+          # to avoid committing dangling or malicious symlinks from upstream
+          cp -aL upstream/slopkit2 new-slopkit2
+
+          # Remove any remaining symlinks defensively
+          find new-slopkit2 -type l -exec rm -f {} +
 
           echo "Temporary copy prepared."
 
       # ============================================================
       # 7. Replace slopkit2
-      #
-      # At this point all validation has passed.
       # ============================================================
       - name: Update slopkit2
         run: |
           set -euo pipefail
 
           rm -rf slopkit2
-
           mv new-slopkit2 slopkit2
 
           echo "slopkit2 updated."
 
       # ============================================================
-      # 8. STAGE files BEFORE checking for changes
-      #
-      # This fixes the original problem:
-      # git diff does NOT detect untracked files.
-      # git diff --cached DOES detect them after git add.
+      # 8. Stage files BEFORE checking for changes
       # ============================================================
       - name: Stage changes
         run: |
           set -euo pipefail
 
           git add slopkit2
-
-          echo "Files staged."
 
           echo "Git status:"
           git status --short
@@ -174,26 +159,26 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git commit -m "Sync slopkit2 from upstream"
+          git commit -m "chore: sync slopkit2 from upstream $(date -u +%Y-%m-%d)"
 
-          echo "Changes committed."
+          echo "Committed."
 
       # ============================================================
-      # 11. Push changes
+      # 11. Push — rebase first to handle concurrent workflow runs
       # ============================================================
       - name: Push changes
         if: steps.changes.outputs.changed == 'true'
         run: |
           set -euo pipefail
 
-          git push
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "$GITHUB_REF_NAME"
 
-          echo "Changes pushed successfully."
+          echo "Pushed successfully."
 
       # ============================================================
       # 12. Nothing changed
       # ============================================================
       - name: Already up to date
         if: steps.changes.outputs.changed == 'false'
-        run: |
-          echo "slopkit2 is already up to date."
+        run: echo "slopkit2 is already up to date. Nothing to push."
