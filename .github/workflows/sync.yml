@@ -11,7 +11,7 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 15          # ← prevents hung clone from wasting quota
+    timeout-minutes: 15
 
     steps:
 
@@ -19,7 +19,7 @@ jobs:
       # 1. Checkout YOUR repository
       # ============================================================
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
 
@@ -99,8 +99,7 @@ jobs:
 
           rm -rf new-slopkit2
 
-          # -a preserves times/perms but we explicitly dereference symlinks
-          # to avoid committing dangling or malicious symlinks from upstream
+          # -aL dereferences symlinks so none land in your repo
           cp -aL upstream/slopkit2 new-slopkit2
 
           # Remove any remaining symlinks defensively
