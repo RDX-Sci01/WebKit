@@ -1,9 +1,12 @@
 name: Deploy website
 
 on:
-  push:
-    branches:
-      - main
+  # Run after the sync workflow completes — not on every push
+  workflow_run:
+    workflows: ["Sync slopkit2"]
+    types:
+      - completed
+  # Still allow manual deploys
   workflow_dispatch:
 
 permissions:
@@ -11,16 +14,19 @@ permissions:
   pages: write
   id-token: write
 
-# Prevent two deploys running simultaneously.
-# cancel-in-progress: false means a queued deploy waits rather than being dropped.
 concurrency:
-  group: "github-pages-deploy"   # ← scoped name avoids collisions with other workflows
+  group: "github-pages-deploy"
   cancel-in-progress: false
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 15           # ← prevents a hung upload from burning quota
+    timeout-minutes: 15
+
+    # Only deploy if the sync actually succeeded
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
 
     environment:
       name: github-pages
@@ -28,21 +34,19 @@ jobs:
 
     steps:
 
-      # ============================================================
-      # 1. Checkout repository
-      # ============================================================
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # Pull latest — including whatever sync just committed
+          ref: main
 
-      # ============================================================
-      # 2. Verify website exists and is sane
-      # ============================================================
       - name: Validate website
         run: |
           set -euo pipefail
 
           if [ ! -d "./slopkit2" ]; then
             echo "::error::slopkit2 directory does not exist."
+            echo "::error::Has the sync workflow run at least once?"
             exit 1
           fi
 
@@ -60,36 +64,20 @@ jobs:
 
           echo "Validation passed. Files found: $FILE_COUNT"
 
-      # ============================================================
-      # 3. Configure GitHub Pages
-      # ============================================================
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      # ============================================================
-      # 4. Package slopkit2 as the Pages artifact
-      #
-      # retention-days: 1 — artifacts are only needed until deployed;
-      # keeping them longer wastes storage quota.
-      # ============================================================
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
           path: "./slopkit2"
           retention-days: 1
 
-      # ============================================================
-      # 5. Deploy to GitHub Pages
-      # ============================================================
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
 
-      # ============================================================
-      # 6. Print deployment URL to the job summary
-      # ============================================================
       - name: Report deployment URL
         run: |
           echo "### Deployed successfully" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "URL: ${{ steps.deployment.outputs.page_url }}" >> "$GITHUB_STEP_SUMMARY"
