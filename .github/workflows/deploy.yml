@@ -1,12 +1,12 @@
 name: Deploy website
 
 on:
-  # Run after the sync workflow completes — not on every push
+  # Only run after sync completes successfully — not on every push
   workflow_run:
     workflows: ["Sync slopkit2"]
     types:
       - completed
-  # Still allow manual deploys
+  # Allow manual deploys (validate step will catch missing slopkit2)
   workflow_dispatch:
 
 permissions:
@@ -23,7 +23,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
-    # Only deploy if the sync actually succeeded
+    # For automatic runs: only deploy if sync succeeded.
+    # For manual runs: proceed and let validate catch any issues.
     if: >
       github.event_name == 'workflow_dispatch' ||
       github.event.workflow_run.conclusion == 'success'
@@ -34,19 +35,25 @@ jobs:
 
     steps:
 
+      # ============================================================
+      # 1. Checkout repository
+      # ============================================================
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
-          # Pull latest — including whatever sync just committed
+          # Explicitly pull latest main so we get what sync just committed
           ref: main
 
+      # ============================================================
+      # 2. Verify website exists and is sane
+      # ============================================================
       - name: Validate website
         run: |
           set -euo pipefail
 
           if [ ! -d "./slopkit2" ]; then
-            echo "::error::slopkit2 directory does not exist."
-            echo "::error::Has the sync workflow run at least once?"
+            echo "::error::slopkit2 does not exist."
+            echo "::error::Run the 'Sync slopkit2' workflow manually first, then re-run deploy."
             exit 1
           fi
 
@@ -56,7 +63,6 @@ jobs:
           fi
 
           FILE_COUNT=$(find ./slopkit2 -type f | wc -l)
-
           if [ "$FILE_COUNT" -eq 0 ]; then
             echo "::error::slopkit2 is empty."
             exit 1
@@ -64,20 +70,36 @@ jobs:
 
           echo "Validation passed. Files found: $FILE_COUNT"
 
+      # ============================================================
+      # 3. Configure GitHub Pages
+      # ============================================================
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      # ============================================================
+      # 4. Package slopkit2 as the Pages artifact
+      #
+      # retention-days: 1 — artifacts are only needed until deployed;
+      # keeping them longer wastes storage quota.
+      # ============================================================
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v3.0.1
         with:
           path: "./slopkit2"
           retention-days: 1
 
+      # ============================================================
+      # 5. Deploy to GitHub Pages
+      # ============================================================
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v4.0.5
 
+      # ============================================================
+      # 6. Print deployment URL to the job summary
+      # ============================================================
       - name: Report deployment URL
         run: |
           echo "### Deployed successfully" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "URL: ${{ steps.deployment.outputs.page_url }}" >> "$GITHUB_STEP_SUMMARY"
