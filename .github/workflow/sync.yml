@@ -1,41 +1,90 @@
 name: Sync slopkit2
 
 on:
+  # Automatically check once per day
   schedule:
     - cron: "0 0 * * *"
+
+  # Allow you to run it manually
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   sync:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout my repo
+      # 1. Get your repository
+      - name: Checkout my repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
+      # 2. Download ONLY the upstream slopkit2 folder
       - name: Download upstream slopkit2
         run: |
-          git clone --depth 1 --filter=blob:none --sparse \
-            https://github.com/zecoxao/zecoxao.github.io.git upstream
+          set -e
+
+          git clone \
+            --depth 1 \
+            --filter=blob:none \
+            --sparse \
+            https://github.com/zecoxao/zecoxao.github.io.git \
+            upstream
 
           cd upstream
+
           git sparse-checkout set slopkit2
 
-      - name: Replace slopkit2
+      # 3. Make sure the download is valid
+      - name: Validate upstream folder
         run: |
-          rm -rf slopkit2
-          cp -r upstream/slopkit2 .
+          set -e
 
+          if [ ! -d "upstream/slopkit2" ]; then
+            echo "ERROR: upstream/slopkit2 does not exist."
+            echo "Keeping existing files."
+            exit 1
+          fi
+
+          if [ -z "$(find upstream/slopkit2 -type f -print -quit)" ]; then
+            echo "ERROR: upstream/slopkit2 is empty."
+            echo "Keeping existing files."
+            exit 1
+          fi
+
+          echo "Upstream slopkit2 looks valid."
+
+      # 4. Replace our copy ONLY after validation succeeds
+      - name: Update slopkit2
+        run: |
+          set -e
+
+          rm -rf slopkit2
+          cp -a upstream/slopkit2 slopkit2
+
+      # 5. Check whether anything actually changed
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet -- slopkit2; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No changes detected."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Changes detected."
+          fi
+
+      # 6. Commit and push only when there are changes
       - name: Commit changes
+        if: steps.changes.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add slopkit2
 
-          if git diff --cached --quiet; then
-            echo "No changes."
-          else
-            git commit -m "Sync slopkit2 from upstream"
-            git push
-          fi
+          git commit -m "Sync slopkit2 from upstream"
+          git push
