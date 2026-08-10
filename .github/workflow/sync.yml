@@ -1,0 +1,41 @@
+name: Sync slopkit2
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout my repo
+        uses: actions/checkout@v4
+
+      - name: Download upstream slopkit2
+        run: |
+          git clone --depth 1 --filter=blob:none --sparse \
+            https://github.com/zecoxao/zecoxao.github.io.git upstream
+
+          cd upstream
+          git sparse-checkout set slopkit2
+
+      - name: Replace slopkit2
+        run: |
+          rm -rf slopkit2
+          cp -r upstream/slopkit2 .
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add slopkit2
+
+          if git diff --cached --quiet; then
+            echo "No changes."
+          else
+            git commit -m "Sync slopkit2 from upstream"
+            git push
+          fi
