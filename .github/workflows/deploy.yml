@@ -13,7 +13,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: false
 
 jobs:
@@ -25,29 +25,58 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      # ---------------------------------------------
-      # 1. Get your repository
-      # ---------------------------------------------
-      - name: Checkout repository
-        uses: actions/checkout@v6
 
-      # ---------------------------------------------
-      # 2. Configure GitHub Pages
-      # ---------------------------------------------
+      # ============================================================
+      # 1. Checkout repository
+      # ============================================================
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ============================================================
+      # 2. Verify website exists
+      # ============================================================
+      - name: Validate website
+        run: |
+          set -euo pipefail
+
+          if [ ! -d "./slopkit2" ]; then
+            echo "::error::slopkit2 directory does not exist."
+            exit 1
+          fi
+
+          if [ ! -f "./slopkit2/index.html" ]; then
+            echo "::error::slopkit2/index.html does not exist."
+            exit 1
+          fi
+
+          FILE_COUNT=$(find ./slopkit2 -type f | wc -l)
+
+          if [ "$FILE_COUNT" -eq 0 ]; then
+            echo "::error::slopkit2 is empty."
+            exit 1
+          fi
+
+          echo "Website validation passed."
+          echo "Files: $FILE_COUNT"
+
+      # ============================================================
+      # 3. Configure GitHub Pages
+      # ============================================================
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      # ---------------------------------------------
-      # 3. Upload slopkit2 as the website
-      # ---------------------------------------------
-      - name: Upload website
+      # ============================================================
+      # 4. Package slopkit2 as the website
+      # ============================================================
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
         with:
           path: "./slopkit2"
+          retention-days: 1
 
-      # ---------------------------------------------
-      # 4. Deploy
-      # ---------------------------------------------
+      # ============================================================
+      # 5. Deploy
+      # ============================================================
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
