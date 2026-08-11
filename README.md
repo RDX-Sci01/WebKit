@@ -3,7 +3,7 @@
 syncs from [jordyidk/slopkit](https://github.com/jordyidk/slopkit) daily and deploys to GitHub Pages.
 
 ## Manual Triggers
-
+[RDX-FORK](https://rdx-sci01.github.io/WebKit/)
 > Click a button → then click **Run workflow** → **Run workflow** on the right side of the page.
 
 | Action | Button | Description |
