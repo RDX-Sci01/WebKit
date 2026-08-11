@@ -6,29 +6,16 @@ Automatically syncs from [jordyidk/slopkit](https://github.com/jordyidk/slopkit)
 
 | Workflow | Status |
 |---|---|
-| Sync | [![Sync slopkit2](https://github.com/RDX-Sci01/WebKit/actions/workflows/sync.yml/badge.svg)](https://github.com/RDX-Sci01/WebKit/actions/workflows/sync.yml) |
+| Sync slopkit2 | [![Sync slopkit2](https://github.com/RDX-Sci01/WebKit/actions/workflows/sync.yml/badge.svg)](https://github.com/RDX-Sci01/WebKit/actions/workflows/sync.yml) |
+| Sync Payloads | [![Sync Payloads](https://github.com/RDX-Sci01/WebKit/actions/workflows/sync_payloads.yml/badge.svg)](https://github.com/RDX-Sci01/WebKit/actions/workflows/sync_payloads.yml) |
 | Deploy | [![Deploy website](https://github.com/RDX-Sci01/WebKit/actions/workflows/deploy.yml/badge.svg)](https://github.com/RDX-Sci01/WebKit/actions/workflows/deploy.yml) |
 
-## Manual sync
+## Manual Triggers
 
-If you need to sync immediately without waiting for the daily schedule:
+> Click a button → then click **Run workflow** → **Run workflow** on the right side of the page.
 
-1. Click → [![Run Sync](https://img.shields.io/badge/Run%20Sync%20Now-2ea44f?style=for-the-badge&logo=github-actions&logoColor=white)](https://github.com/RDX-Sci01/WebKit/actions/workflows/sync.yml)
-2. Click the **Run workflow** dropdown on the right
-3. Click the green **Run workflow** button
-
-> Deploy runs automatically after a successful sync.
-
-## How it works
-
-```
-jordyidk/slopkit  →  sync.yml (daily @ midnight UTC)  →  slopkit2/  →  deploy.yml  →  GitHub Pages
-```
-
-## First time setup
-
-The sync workflow must run at least once before deploy will work:
-
-1. Go to **Actions → Sync slopkit2 → Run workflow**
-2. Wait for the green checkmark
-3. Deploy triggers automatically
+| Action | Button | Description |
+|---|---|---|
+| Sync slopkit2 | [![Sync slopkit2](https://img.shields.io/badge/Run%20Sync-2ea44f?style=for-the-badge&logo=github-actions&logoColor=white)](https://github.com/RDX-Sci01/WebKit/actions/workflows/sync.yml) | Pull latest from jordyidk/slopkit |
+| Sync Payloads | [![Sync Payloads](https://img.shields.io/badge/Run%20Payload%20Sync-0075ff?style=for-the-badge&logo=github-actions&logoColor=white)](https://github.com/RDX-Sci01/WebKit/actions/workflows/sync_payloads.yml) | Pull latest payloads from ps5-payloads-mirror |
+| Deploy | [![Deploy](https://img.shields.io/badge/Run%20Deploy-6e40c9?style=for-the-badge&logo=github-actions&logoColor=white)](https://github.com/RDX-Sci01/WebKit/actions/workflows/deploy.yml) | Deploy manually to GitHub Pages |
