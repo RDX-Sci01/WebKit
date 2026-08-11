@@ -1,8 +1,6 @@
 name: Sync slopkit2
 
 on:
-  schedule:
-    - cron: "0 0 * * *"
   workflow_dispatch:
 
 permissions:
@@ -24,7 +22,7 @@ jobs:
           fetch-depth: 0
 
       # ============================================================
-      # 2. Download upstream repository (root, no subfolder)
+      # 2. Download upstream repository
       # ============================================================
       - name: Download upstream slopkit
         run: |
@@ -76,15 +74,14 @@ jobs:
           echo "Folder contains files."
 
       # ============================================================
-      # 5. Prepare a temporary copy (strip .git and symlinks)
+      # 5. Prepare new copy (strip .git and symlinks)
       # ============================================================
-      - name: Prepare new copy
+      - name: Prepare new slopkit2 copy
         run: |
           set -euo pipefail
 
           rm -rf new-slopkit2
 
-          # Copy everything except the .git folder
           rsync -a --exclude='.git' upstream/ new-slopkit2/
 
           # Remove any symlinks defensively
@@ -93,7 +90,33 @@ jobs:
           echo "Temporary copy prepared."
 
       # ============================================================
-      # 6. Replace slopkit2
+      # 6. Preserve mirror payloads across sync
+      #
+      # The upstream has its own payloads/ folder (ps5_autoload.elf
+      # etc). We keep those BUT also layer our mirror payloads on top
+      # so nothing from sync_payloads.yml gets lost.
+      #
+      # Priority: mirror payloads win over upstream payloads on
+      # filename conflict, since they are versioned and checksummed.
+      # ============================================================
+      - name: Preserve mirror payloads
+        run: |
+          set -euo pipefail
+
+          if [ -d "slopkit2/payloads" ]; then
+            echo "Merging existing mirror payloads into new copy..."
+
+            # new-slopkit2/payloads already has upstream payloads.
+            # Copy mirror payloads on top — rsync skips identical files.
+            rsync -a slopkit2/payloads/ new-slopkit2/payloads/
+
+            echo "Mirror payloads preserved."
+          else
+            echo "No existing mirror payloads to preserve."
+          fi
+
+      # ============================================================
+      # 7. Replace slopkit2
       # ============================================================
       - name: Update slopkit2
         run: |
@@ -105,7 +128,7 @@ jobs:
           echo "slopkit2 updated."
 
       # ============================================================
-      # 7. Stage files BEFORE checking for changes
+      # 8. Stage files BEFORE checking for changes
       # ============================================================
       - name: Stage changes
         run: |
@@ -117,7 +140,7 @@ jobs:
           git status --short
 
       # ============================================================
-      # 8. Determine whether anything changed
+      # 9. Determine whether anything changed
       # ============================================================
       - name: Check for changes
         id: changes
@@ -133,7 +156,7 @@ jobs:
           fi
 
       # ============================================================
-      # 9. Commit changes
+      # 10. Commit changes
       # ============================================================
       - name: Commit changes
         if: steps.changes.outputs.changed == 'true'
@@ -148,7 +171,7 @@ jobs:
           echo "Committed."
 
       # ============================================================
-      # 10. Push — rebase first to handle concurrent workflow runs
+      # 11. Push — rebase first to handle concurrent workflow runs
       # ============================================================
       - name: Push changes
         if: steps.changes.outputs.changed == 'true'
@@ -161,7 +184,7 @@ jobs:
           echo "Pushed successfully."
 
       # ============================================================
-      # 11. Nothing changed
+      # 12. Nothing changed
       # ============================================================
       - name: Already up to date
         if: steps.changes.outputs.changed == 'false'
