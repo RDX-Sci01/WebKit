@@ -1,6 +1,7 @@
 # WebKit / slopkit2
 
-syncs from [jordyidk/slopkit](https://github.com/jordyidk/slopkit) daily and deploys to GitHub Pages.
+syncs from [jordyidk/slopkit](https://github.com/jordyidk/slopkit) | GitHub Pages.
+syncs from [Not-Yitan](https://github.com/Not-Yitan/ChileServer-Slopkit)  | GitHub Pages.
 
 ## Manual Triggers
 [RDX-FORK](https://rdx-sci01.github.io/WebKit/)
