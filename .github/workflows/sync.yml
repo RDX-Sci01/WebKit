@@ -24,9 +24,9 @@ jobs:
           fetch-depth: 0
 
       # ============================================================
-      # 2. Download upstream repository
+      # 2. Download upstream repository (root, no subfolder)
       # ============================================================
-      - name: Download upstream slopkit2
+      - name: Download upstream slopkit
         run: |
           set -euo pipefail
 
@@ -34,64 +34,49 @@ jobs:
 
           git clone \
             --depth 1 \
-            --filter=blob:none \
-            --sparse \
-            https://github.com/zecoxao/zecoxao.github.io.git \
+            https://github.com/jordyidk/slopkit.git \
             upstream
-
-          cd upstream
-          git sparse-checkout set slopkit2
-          cd ..
 
           echo "Download completed."
 
       # ============================================================
-      # 3. Verify slopkit2 exists
+      # 3. Verify upstream exists and has index.html
       # ============================================================
       - name: Validate upstream folder
         run: |
           set -euo pipefail
 
-          if [ ! -d "upstream/slopkit2" ]; then
-            echo "::error::Upstream slopkit2 folder does not exist."
+          if [ ! -d "upstream" ]; then
+            echo "::error::Upstream clone failed — directory missing."
             exit 1
           fi
 
-          echo "slopkit2 folder exists."
+          if [ ! -f "upstream/index.html" ]; then
+            echo "::error::upstream/index.html is missing. Aborting."
+            exit 1
+          fi
+
+          echo "upstream/index.html exists."
 
       # ============================================================
-      # 4. Make sure slopkit2 is NOT empty
+      # 4. Make sure upstream is NOT empty
       # ============================================================
       - name: Validate files
         run: |
           set -euo pipefail
 
-          FILE_COUNT=$(find upstream/slopkit2 -type f | wc -l)
+          FILE_COUNT=$(find upstream -type f -not -path "upstream/.git/*" | wc -l)
           echo "Upstream contains $FILE_COUNT files."
 
           if [ "$FILE_COUNT" -eq 0 ]; then
-            echo "::error::Upstream slopkit2 is EMPTY. Aborting to protect your copy."
+            echo "::error::Upstream is EMPTY. Aborting to protect your copy."
             exit 1
           fi
 
           echo "Folder contains files."
 
       # ============================================================
-      # 5. Make sure the website has index.html
-      # ============================================================
-      - name: Validate index.html
-        run: |
-          set -euo pipefail
-
-          if [ ! -f "upstream/slopkit2/index.html" ]; then
-            echo "::error::upstream/slopkit2/index.html is missing. Aborting."
-            exit 1
-          fi
-
-          echo "index.html exists."
-
-      # ============================================================
-      # 6. Prepare a temporary copy (strip symlinks for safety)
+      # 5. Prepare a temporary copy (strip .git and symlinks)
       # ============================================================
       - name: Prepare new copy
         run: |
@@ -99,16 +84,16 @@ jobs:
 
           rm -rf new-slopkit2
 
-          # -aL dereferences symlinks so none land in your repo
-          cp -aL upstream/slopkit2 new-slopkit2
+          # Copy everything except the .git folder
+          rsync -a --exclude='.git' upstream/ new-slopkit2/
 
-          # Remove any remaining symlinks defensively
+          # Remove any symlinks defensively
           find new-slopkit2 -type l -exec rm -f {} +
 
           echo "Temporary copy prepared."
 
       # ============================================================
-      # 7. Replace slopkit2
+      # 6. Replace slopkit2
       # ============================================================
       - name: Update slopkit2
         run: |
@@ -120,7 +105,7 @@ jobs:
           echo "slopkit2 updated."
 
       # ============================================================
-      # 8. Stage files BEFORE checking for changes
+      # 7. Stage files BEFORE checking for changes
       # ============================================================
       - name: Stage changes
         run: |
@@ -132,7 +117,7 @@ jobs:
           git status --short
 
       # ============================================================
-      # 9. Determine whether anything changed
+      # 8. Determine whether anything changed
       # ============================================================
       - name: Check for changes
         id: changes
@@ -148,7 +133,7 @@ jobs:
           fi
 
       # ============================================================
-      # 10. Commit changes
+      # 9. Commit changes
       # ============================================================
       - name: Commit changes
         if: steps.changes.outputs.changed == 'true'
@@ -163,7 +148,7 @@ jobs:
           echo "Committed."
 
       # ============================================================
-      # 11. Push — rebase first to handle concurrent workflow runs
+      # 10. Push — rebase first to handle concurrent workflow runs
       # ============================================================
       - name: Push changes
         if: steps.changes.outputs.changed == 'true'
@@ -176,7 +161,7 @@ jobs:
           echo "Pushed successfully."
 
       # ============================================================
-      # 12. Nothing changed
+      # 11. Nothing changed
       # ============================================================
       - name: Already up to date
         if: steps.changes.outputs.changed == 'false'
