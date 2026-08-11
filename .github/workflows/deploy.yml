@@ -1,12 +1,18 @@
 name: Deploy website
 
 on:
-  # Only run after sync completes successfully — not on every push
+  # Trigger on direct commits to main
+  push:
+    branches:
+      - main
+
+  # Also trigger after sync workflows complete
   workflow_run:
-    workflows: ["Sync slopkit2"]
+    workflows: ["Sync slopkit2", "Sync Payloads"]
     types:
       - completed
-  # Allow manual deploys (validate step will catch missing slopkit2)
+
+  # Allow manual deploys
   workflow_dispatch:
 
 permissions:
@@ -23,9 +29,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
-    # For automatic runs: only deploy if sync succeeded.
-    # For manual runs: proceed and let validate catch any issues.
+    # For workflow_run: only deploy if the triggering sync succeeded.
+    # For push and manual: always proceed (validate step catches issues).
     if: >
+      github.event_name == 'push' ||
       github.event_name == 'workflow_dispatch' ||
       github.event.workflow_run.conclusion == 'success'
 
@@ -41,7 +48,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4.2.2
         with:
-          # Explicitly pull latest main so we get what sync just committed
           ref: main
 
       # ============================================================
@@ -78,9 +84,6 @@ jobs:
 
       # ============================================================
       # 4. Package slopkit2 as the Pages artifact
-      #
-      # retention-days: 1 — artifacts are only needed until deployed;
-      # keeping them longer wastes storage quota.
       # ============================================================
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3.0.1
