@@ -33,7 +33,7 @@ KLOG SERVER is still included and has simply been moved to the bottom of the men
 A new payload has been added:
 
 ```text
-payloads/pldmgr_v0.5.1.elf
+payloads/ps5_autoload.elf
 ```
 
 Once Slopkit successfully reaches:
@@ -143,7 +143,7 @@ Payload menu
         ↓
 PS5 AUTOLOAD
         ↓
-pldmgr_v0.5.1.elf
+ps5_autoload.elf
 ```
 
 instead of immediately executing the autoloader.
@@ -260,7 +260,7 @@ Maintained by:
 Changes introduced by this fork include:
 
 - PS5 AUTOLOAD integration
-- `pldmgr_v0.5.1.elf` payload option
+- `ps5_autoload.elf` payload option
 - PS5 AUTOLOAD menu entry
 - PS5-browser-compatible AUTOLOAD UI assets
 - manual autoloader execution workflow

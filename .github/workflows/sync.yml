@@ -92,7 +92,7 @@ jobs:
       # ============================================================
       # 6. Preserve mirror payloads across sync
       #
-      # The upstream has its own payloads/ folder (pldmgr_v0.5.1.elf
+      # The upstream has its own payloads/ folder (ps5_autoload.elf
       # etc). We keep those BUT also layer our mirror payloads on top
       # so nothing from sync_payloads.yml gets lost.
       #
