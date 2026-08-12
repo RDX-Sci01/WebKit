@@ -1,0 +1,191 @@
+[
+  {
+    "name": "WebKit-Autoloader-Installer",
+    "filename": "WebKit-Autoloader-Installer_v0.1.1.elf",
+    "version": "v0.1.1",
+    "description": "Installs WebKit Autoloader on homescreen (firmwares 9.00-12.00)",
+    "last_update": "2026-08-11",
+    "source": "https://github.com/itsPLK/ps5-webkit-autoloader/releases",
+    "checksum": "162892ca3d6ae9b89764fa6447401b94e62148b21855a9b971b41458955accc1"
+  },
+  {
+    "name": "nanoDNS",
+    "filename": "nanoDNS_0.4.elf",
+    "version": "0.4",
+    "description": "Local DNS proxy server",
+    "last_update": "2026-08-04",
+    "source": "https://github.com/drakmor/nanoDNS/releases",
+    "checksum": "dcb845f3570771275b22b37534bf924a7f8ae219fb91ef00c6bccab85d1c2420"
+  },
+  {
+    "name": "pldmgr",
+    "filename": "pldmgr_v0.5.1.elf",
+    "version": "v0.5.1",
+    "description": "A modern, web-based dashboard to easily manage, import, and automatically load payloads on your PS5.",
+    "last_update": "2026-08-02",
+    "source": "https://github.com/itsPLK/pldmgr/releases",
+    "checksum": "05617c69ea145d1c11b8f7a6b7d3bd9e6df3831afd25d71a4ac85d63fb8e28aa"
+  },
+  {
+    "name": "websrv",
+    "filename": "websrv_v0.34.elf",
+    "version": "v0.34",
+    "description": "A simple web server that accepts connections on port 8080",
+    "last_update": "2026-08-02",
+    "source": "https://github.com/ps5-payload-dev/websrv/releases",
+    "checksum": "54730c867c6e1148536fdcb370e63a7762d989ea87b62488ad4caff64d43f263"
+  },
+  {
+    "name": "shsrv",
+    "filename": "shsrv_v0.20.elf",
+    "version": "v0.20",
+    "description": "A simple telnet-like shell server for jailbroken PS5s that accepts connections on port 2323",
+    "last_update": "2026-08-02",
+    "source": "https://github.com/ps5-payload-dev/shsrv/releases",
+    "checksum": "fa4ccb2587bb61be317df0d001f668b17ebf9b4aafad87acf691b1fb8da0bd2d"
+  },
+  {
+    "name": "ftpsrv",
+    "filename": "ftpsrv_v0.21.elf",
+    "version": "v0.21",
+    "description": "A simple FTP server that accepts connections on port 2121",
+    "last_update": "2026-08-02",
+    "source": "https://github.com/ps5-payload-dev/ftpsrv/releases",
+    "checksum": "c580f0534ac6349dc5a4a5c656eaced537b4c2b18da51886d943cea6393436c8"
+  },
+  {
+    "name": "klogsrv",
+    "filename": "klogsrv_v0.9.elf",
+    "version": "v0.9",
+    "description": "A simple socket server that redirects /dev/klog to sockets connected on port 3232",
+    "last_update": "2026-08-02",
+    "source": "https://github.com/ps5-payload-dev/klogsrv/releases",
+    "checksum": "e828ec144231f81547cb58bc7d2c396fa984be0c2295f31364b58017816dcceb"
+  },
+  {
+    "name": "elfldr",
+    "filename": "elfldr_v0.24.elf",
+    "version": "v0.24",
+    "description": "An ELF loader for jailbroken PS5s that accepts payloads on port 9021",
+    "last_update": "2026-08-02",
+    "source": "https://github.com/ps5-payload-dev/elfldr/releases",
+    "checksum": "e23313367cf59a9b0a09e34eb59e435e2c387de418e557d65bf578b7744942a5"
+  },
+  {
+    "name": "ps5-app-dumper",
+    "filename": "ps5-app-dumper_v1.11.elf",
+    "version": "v1.11",
+    "description": "A small utility to dump PS5 application files from the console's pfsmnt to a connected USB storage device.",
+    "last_update": "2026-07-28",
+    "source": "https://github.com/EchoStretch/ps5-app-dumper/releases",
+    "checksum": "42763a6230df8ef3bf82253e9a4290e39d7c1e4b61a0a9a4477368f1d6440e1d"
+  },
+  {
+    "name": "garlic-savemgr",
+    "filename": "garlic-savemgr_v1.12.elf",
+    "version": "v1.12",
+    "description": "PS5 save decrypt/encrypt/browse with embedded web UI.",
+    "last_update": "2026-07-13",
+    "source": "https://git.etawen.dev/earthonion/garlic-savemgr/releases",
+    "checksum": "245150007dd2c48da6d0fdf791396a31434095e27f0175587b7b18ec3b8d6d5d"
+  },
+  {
+    "name": "ps5-linux-loader",
+    "filename": "ps5-linux-loader_v2.4.elf",
+    "version": "v2.4",
+    "description": "Linux payload implementing HV exploits to run a custom bootloader",
+    "last_update": "2026-07-06",
+    "source": "https://github.com/ps5-linux/ps5-linux-loader/releases",
+    "checksum": "51382795b486f7c5a3681648d457d129088311fc3f9601aeaff78dc72fafcf1d"
+  },
+  {
+    "name": "kstuff-lite",
+    "filename": "kstuff-lite_v1.09.elf",
+    "version": "v1.09",
+    "description": "Lite version of kstuff",
+    "last_update": "2026-07-04",
+    "source": "https://github.com/EchoStretch/kstuff-lite/releases",
+    "checksum": "ec5212794dc6e44ee8e70fd0549abec6d3dac8c3e03ddbeafd9f869ffe97d4e8"
+  },
+  {
+    "name": "ShadowMountPlus",
+    "filename": "ShadowMountPlus_1.6beta16.elf",
+    "version": "1.6beta16",
+    "description": "A fully automated, background 'Auto-Mounter' payload for Jailbroken PlayStation 5 consoles.",
+    "last_update": "2026-06-28",
+    "source": "https://github.com/drakmor/ShadowMountPlus/releases",
+    "checksum": "a35246fb3bb6042b25653b51cdcbc33254b40339342bf1d2dd0d2eceee2ca526"
+  },
+  {
+    "name": "ps5debug-NG",
+    "filename": "ps5debug-NG_1.3.0.elf",
+    "version": "1.3.0",
+    "description": "PS5 debugger payload - userland TCP wire-protocol server hosted inside SceShellCore.",
+    "last_update": "2026-06-21",
+    "source": "https://github.com/OpenSourcereR-dev/ps5debug-NG/releases",
+    "checksum": "8f75fb90b45d7cc4d59147e3323577d7264cf572c78a27f76722202f492ad16a"
+  },
+  {
+    "name": "zftpd",
+    "filename": "zftpd_v1.5.0.elf",
+    "version": "v1.5.0",
+    "description": "Zero-copy FTP/HTTP Server",
+    "last_update": "2026-06-14",
+    "source": "https://github.com/seregonwar/zftpd/releases",
+    "checksum": "6cf6a738112fc339619ebe772690fa611f60ecdb20164a0e3f49e137277bc42b"
+  },
+  {
+    "name": "Lapy-JB-Daemon",
+    "filename": "Lapy-JB-Daemon_v1.2.elf",
+    "version": "v1.2",
+    "description": "Standalone homebrew jailbreak daemon for PS5. Mimics etaHEN's jailbreak-on-demand API.",
+    "last_update": "2026-06-01",
+    "source": "https://github.com/itsPLK/PS5-Lapy-JB-Daemon/releases",
+    "checksum": "13559b858fc33cc7fa3dc89e10dccf139070d99ee5d378dd75c969293700799e"
+  },
+  {
+    "name": "kstuff-toggle",
+    "filename": "kstuff-toggle_0.6.elf",
+    "version": "0.6",
+    "description": "Boost homebrew game performance on your PS5 by disabling Kstuff after launching the game.",
+    "last_update": "2026-05-07",
+    "source": "https://github.com/EchoStretch/kstuff-toggle/releases",
+    "checksum": "a1e99f2758aea98e78a37d1a1c2f79b08187acb35c7410eec4c8f4763162768f"
+  },
+  {
+    "name": "BackPork",
+    "filename": "BackPork_0.1.elf",
+    "version": "0.1",
+    "description": "Lets you sideload system libraries into PS5 games",
+    "last_update": "2026-04-30",
+    "source": "https://github.com/BestPig/BackPork/releases",
+    "checksum": "d74e4cd119b2bb1fd423f2f5b1c9a7f096b3e588c753af1ab48b983d56216a52"
+  },
+  {
+    "name": "ftpsrv-drakmor",
+    "filename": "ftpsrv-drakmor_1.15-ng-stable.elf",
+    "version": "1.15-ng-stable",
+    "description": "drakmor's fork of ftpsrv",
+    "last_update": "2026-04-08",
+    "source": "https://github.com/drakmor/ftpsrv/releases",
+    "checksum": "913a443af847b6861ec11748e2640f62d1fc1027076f576aa0ddccab8507311f"
+  },
+  {
+    "name": "kstuff",
+    "filename": "kstuff_v1.6.7.elf",
+    "version": "v1.6.7",
+    "description": "Dynamically patches the PS5 kernel to bypass security",
+    "last_update": "2026-01-04",
+    "source": "https://github.com/EchoStretch/kstuff/releases",
+    "checksum": "f1c1f4b2b6395644af04cbe9828aba58586acf7aacb9e01113cac92ce16e3569"
+  },
+  {
+    "name": "etaHEN",
+    "filename": "etaHEN_2.5B.bin",
+    "version": "2.5B",
+    "description": "AIO HEN payload",
+    "last_update": "2025-12-25",
+    "source": "https://github.com/etaHEN/etaHEN/releases",
+    "checksum": "4845cac45095361b8983b14d6690622183b0dcfbf6d7fda16e161aa91ff0531e"
+  }
+]
