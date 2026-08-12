@@ -4,7 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>slopkit</title>
-<link rel="preload" href="cat.jpg" as="image">
 <link rel="preload" href="mmhmm-cats-ps5.gif" as="image">
 
 <script>(function () {
@@ -756,7 +755,7 @@ function setCatResult(success) {
         cat.className = success ? "ok" : "bad";
         if (success) {
             const image = document.getElementById("catImage");
-            if (image) image.src = "cat.jpg";
+            //if (image) image.src = "cat.jpg";
         }
     }
 }
