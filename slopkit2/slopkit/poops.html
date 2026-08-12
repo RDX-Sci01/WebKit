@@ -223,7 +223,7 @@
 <pre id="scr"></pre>
 <div id="payloadMenu">
   <img class="menuTitle" data-src="../ui/payload-menu-title.png" alt="">
-  <a class="payloadTile" href="#" data-name="ps5_autoload.elf" data-key="autoload"><img data-src="../ui/payload-autoload-default.png" alt="PS5 AUTOLOAD"></a>
+  <a class="payloadTile" href="#" data-name="pldmgr_v0.5.1.elf" data-key="autoload"><img data-src="../ui/payload-autoload-default.png" alt="PS5 AUTOLOAD"></a>
   <a class="payloadTile" href="#" data-name="ftpsrv-ps5.elf" data-key="ftp"><img data-src="../ui/payload-ftp-default.png" alt=""></a>
   <a class="payloadTile" href="#" data-name="gdbsrv-ps5.elf" data-key="gdb"><img data-src="../ui/payload-gdb-default.png" alt=""></a>
   <a class="payloadTile" href="#" data-name="shsrv-ps5.elf" data-key="shell"><img data-src="../ui/payload-shell-default.png" alt=""></a>
@@ -578,7 +578,7 @@ async function sendPayloadToElfldr(name) {
         throw new Error("the ROP chain is unusable after " + chainDead);
     if (payloadSenderBlocked)
         throw new Error(payloadSenderBlocked);
-    if (!payloadIsListed(name) && name !== "ps5_autoload.elf")
+    if (!payloadIsListed(name) && name !== "pldmgr_v0.5.1.elf")
         throw new Error("payload is not listed in this menu");
 
     const response = await fetch("../payloads/" + encodeURIComponent(name),
